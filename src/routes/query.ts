@@ -3,7 +3,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 
 const router = Router();
 
-// Use Solana Mainnet or Devnet RPC (choose one; Alchemy provides a URL too)
+// Use Solana Devnet RPC (choose one; Alchemy provides a URL too)
 const connection = new Connection('https://api.mainnet-beta.solana.com');
 
 router.get('/:txHash', async (req: any, res: any) => {

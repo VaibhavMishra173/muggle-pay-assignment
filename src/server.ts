@@ -15,10 +15,9 @@ app.get('/', (_req, res) => {
   res.send('MugglePay Backend is up!');
 });
 
-app.use('/webhook', webhookRoute); // 👈 Add this line
+app.use('/webhook', webhookRoute);
 
 app.use('/query', queryRoute);
-
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

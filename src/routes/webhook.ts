@@ -1,44 +1,63 @@
-import { Router, Request, Response } from 'express';
+import express from "express";
+const router = express.Router();
 
-const router = Router();
+// Your devnet wallet address
+const MONITORED_ADDRESS = "HVZT7orfMe89V82S381WzQWHGGzJ4LM6J8foVwRoGkGu";
+// Devnet USDC Mint (can update based on real token if needed)
+const USDC_DEVNET_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC1FdKkq8Zz8f7fZk";
 
-// Solana USDC Mint Address
-const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-
-router.post('/', (req: any, res: any) => {
-  const data = req.body;
-
-  console.log('🔔 Webhook Received!');
-
+router.post("/", async (req: any, res: any) => {
   try {
-    const { events, transaction } = data;
+    const body = req.body;
 
-    // You may need to customize this depending on Alchemy's exact payload
-    const transfers = events?.nativeTransfers || [];
+    const transactions = body?.event?.transaction;
+    if (!transactions || transactions.length === 0) {
+      return res.status(400).json({ message: "No transactions in webhook." });
+    }
 
-    for (const transfer of transfers) {
-      const { amount, from, to, mint, rawAmount } = transfer;
+    for (const tx of transactions) {
+      const signature = tx.signature;
+      const message = tx.transaction?.[0]?.message?.[0];
+      const meta = tx.meta?.[0];
 
-      // Check if it's USDC
-      if (mint === USDC_MINT) {
-        // Check if amount is exactly 0.01 USDC (raw amount is in lamports: 0.01 * 10^6)
-        if (rawAmount === '10000') {
-          console.log('✅ Valid USDC Payment Detected!');
-          console.log(`Amount: ${amount}`);
-          console.log(`Token: USDC`);
-          console.log(`From: ${from}`);
-          console.log(`To: ${to}`);
-          console.log(`Transaction Signature: ${transaction?.signature || 'Unknown'}`);
-        } else {
-          console.log(`⚠️ USDC detected, but amount is not 0.01: ${amount}`);
+      if (!message || !meta) continue;
+
+      const accountKeys = message.account_keys;
+      const instructions = message.instructions;
+
+      for (const inst of instructions) {
+        const programId = accountKeys[inst.program_id_index];
+
+        // Looking for 'spl-token' instructions (token transfers)
+        if (programId === "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") {
+          const fromIndex = inst.accounts[0];
+          const toIndex = inst.accounts[1];
+          const source = accountKeys[fromIndex];
+          const destination = accountKeys[toIndex];
+
+          const postTokenBalances = meta.post_token_balances || [];
+
+          const usdcTransfer = postTokenBalances.find(
+            (t: any) =>
+              t.mint === USDC_DEVNET_MINT &&
+              t.owner === MONITORED_ADDRESS
+          );
+
+          if (usdcTransfer) {
+            console.log("✅ USDC transfer detected!");
+            console.log("🔁 From:", source);
+            console.log("📥 To:", destination);
+            console.log("💰 Amount:", parseFloat(usdcTransfer.ui_token_amount.ui_amount_string), "USDC");
+            console.log("🔗 Signature:", signature);
+          }
         }
       }
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ message: "Webhook received successfully." });
   } catch (err) {
-    console.error('❌ Error parsing webhook:', err);
-    return res.status(500).json({ success: false, message: 'Error processing webhook' });
+    console.error("Webhook error:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 
