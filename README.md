@@ -1,4 +1,5 @@
 # muggle-pay-assignment
+
 # 🪙 MugglePay USDC Solana Webhook Listener
 
 This is a TypeScript-based backend API that:
@@ -36,7 +37,7 @@ npm run dev
 
 ### 🔔 `POST /webhook`
 
-Handle webhook from Alchemy or other Solana monitoring service.
+Handle webhook from Alchemy monitoring service.
 
 **Trigger:**
 Send a USDC SPL token transaction of 0.01 USDC to your Solana wallet.
@@ -47,17 +48,61 @@ Send a USDC SPL token transaction of 0.01 USDC to your Solana wallet.
 curl -X POST http://localhost:3000/webhook \
 -H "Content-Type: application/json" \
 -d '{
-  "transaction": { "signature": "demo_hash_123" },
-  "events": {
-    "nativeTransfers": [
+  "webhookId": "wh_example",
+  "id": "whevt_example",
+  "createdAt": "2024-09-19T16:03:51.396Z",
+  "type": "ADDRESS_ACTIVITY",
+  "event": {
+    "transaction": [
       {
-        "from": "SenderAddressHere",
-        "to": "YourWalletHere",
-        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "amount": "0.01",
-        "rawAmount": "10000"
+        "signature": "demo_hash_123",
+        "transaction": [
+          {
+            "signatures": ["demo_hash_123"],
+            "message": [
+              {
+                "header": [
+                  {
+                    "num_required_signatures": 1,
+                    "num_readonly_signed_accounts": 0,
+                    "num_readonly_unsigned_accounts": 2
+                  }
+                ],
+                "instructions": [
+                  {
+                    "accounts": [0, 1],
+                    "data": "sampleData",
+                    "program_id_index": 1
+                  }
+                ],
+                "account_keys": [
+                  "SenderAddressHere",
+                  "YourWalletHere",
+                  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                ],
+                "recent_blockhash": "exampleBlockhash"
+              }
+            ]
+          }
+        ],
+        "meta": [
+          {
+            "post_token_balances": [
+              {
+                "account_index": 1,
+                "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC1FdKkq8Zz8f7fZk",
+                "owner": "YourWalletHere",
+                "ui_token_amount": {
+                  "ui_amount_string": "0.01"
+                }
+              }
+            ]
+          }
+        ]
       }
-    ]
+    ],
+    "slot": 290766538,
+    "network": "SOLANA_DEVNET"
   }
 }'
 ```
