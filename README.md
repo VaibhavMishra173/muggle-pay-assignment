@@ -46,65 +46,48 @@ Send a USDC SPL token transaction of 0.01 USDC to your Solana wallet.
 
 ```bash
 curl -X POST http://localhost:3000/webhook \
--H "Content-Type: application/json" \
--d '{
-  "webhookId": "wh_example",
-  "id": "whevt_example",
-  "createdAt": "2024-09-19T16:03:51.396Z",
-  "type": "ADDRESS_ACTIVITY",
-  "event": {
-    "transaction": [
-      {
-        "signature": "demo_hash_123",
-        "transaction": [
-          {
-            "signatures": ["demo_hash_123"],
-            "message": [
-              {
-                "header": [
-                  {
-                    "num_required_signatures": 1,
-                    "num_readonly_signed_accounts": 0,
-                    "num_readonly_unsigned_accounts": 2
-                  }
-                ],
-                "instructions": [
-                  {
-                    "accounts": [0, 1],
-                    "data": "sampleData",
-                    "program_id_index": 1
-                  }
-                ],
-                "account_keys": [
-                  "SenderAddressHere",
-                  "YourWalletHere",
-                  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-                ],
-                "recent_blockhash": "exampleBlockhash"
-              }
-            ]
-          }
-        ],
-        "meta": [
-          {
-            "post_token_balances": [
-              {
-                "account_index": 1,
-                "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC1FdKkq8Zz8f7fZk",
-                "owner": "YourWalletHere",
-                "ui_token_amount": {
-                  "ui_amount_string": "0.01"
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": {
+      "transaction": [
+        {
+          "signature": "test-tx-hash-123",
+          "transaction": [
+            {
+              "message": [
+                {
+                  "account_keys": [
+                    "SenderWalletAddress",
+                    "HVZT7orfMe89V82S381WzQWHGGzJ4LM6J8foVwRoGkGu",
+                    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                  ],
+                  "instructions": [
+                    {
+                      "program_id_index": 2,
+                      "accounts": [0, 1]
+                    }
+                  ]
                 }
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "slot": 290766538,
-    "network": "SOLANA_DEVNET"
-  }
-}'
+              ]
+            }
+          ],
+          "meta": [
+            {
+              "post_token_balances": [
+                {
+                  "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC1FdKkq8Zz8f7fZk",
+                  "owner": "HVZT7orfMe89V82S381WzQWHGGzJ4LM6J8foVwRoGkGu",
+                  "ui_token_amount": {
+                    "ui_amount_string": "0.01"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }'
 ```
 
 ---
